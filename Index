@@ -1,4 +1,3 @@
-<!-- VERSION 11 -->
 <!DOCTYPE html>
 <html>
 
@@ -51,13 +50,18 @@
       max-width: 200px; /* Adjust the maximum width as needed */
     }
 
+    /* New style for the baseball diamond container */
+    #diamondContainer {
+      font-family: monospace; /* Use monospace font for better alignment */
+      white-space: pre; /* Preserve whitespaces for better formatting */
+      margin-top: 20px; /* Adjust the margin as needed */
+      position: relative;
+    }
+
     /* New style for player names on the baseball diamond */
     .player-name {
       position: absolute;
-      background-color: lightblue; /* Adjust the color as needed */
-      padding: 5px; /* Adjust the padding as needed */
-      border: 1px solid #000; /* Adjust the border as needed */
-      font-size: 12px; /* Adjust the font size as needed */
+      color: #333; /* Adjust the color as needed */
     }
   </style>
 </head>
@@ -74,7 +78,7 @@
     // Array to track used player buttons
     var usedPlayerButtons = [];
 
-    // Array to store selected players with positions
+    // Array to store selected players for baseball diamond display
     var selectedPlayers = [];
 
     // Function to create buttons and position list
@@ -86,6 +90,9 @@
 
       // Create position list
       createPositionList();
+
+      // Create diamond container
+      createDiamondContainer();
     }
 
     // Function to create a player button
@@ -116,6 +123,13 @@
         listItem.innerHTML = positions[i] + ": ";
         list.appendChild(listItem);
       }
+    }
+
+    // Function to create the diamond container
+    function createDiamondContainer() {
+      var diamondContainer = document.createElement("div");
+      diamondContainer.id = "diamondContainer";
+      document.body.appendChild(diamondContainer);
     }
 
     // Function to show the position assignment popup
@@ -183,17 +197,48 @@
           // Add filled position to the array
           filledPositions.push(positions[i]);
 
-          // Store selected player with position
+          // Add selected player to the array
           selectedPlayers.push({ playerName: playerName, position: position });
-
-          // Display player on the baseball diamond
-          displayOnBaseballDiamond();
         }
       }
 
       // Change style of the player button
       playerButton.classList.add("filled-position");
       playerButton.disabled = true;
+
+      // Display selected players on the baseball diamond
+      displaySelectedPlayers();
+    }
+
+    // Function to display selected players on the baseball diamond within the diamondContainer
+    function displaySelectedPlayers() {
+      // Clear existing player names in diamondContainer
+      var diamondContainer = document.getElementById("diamondContainer");
+      diamondContainer.innerHTML = "";
+
+      // Add player names to the baseball diamond within diamondContainer
+      selectedPlayers.forEach(function (player) {
+        var playerElement = document.createElement("div");
+        playerElement.innerHTML = player.playerName + "<br>" + player.position;
+        playerElement.classList.add("player-name");
+
+        // Calculate position percentages based on diamondContainer dimensions
+        var containerWidth = diamondContainer.offsetWidth;
+        var containerHeight = diamondContainer.offsetHeight;
+
+        switch (player.position) {
+          // Adjust these calculations based on your desired layout within diamondContainer
+          case "Pitcher":
+            playerElement.style.left = containerWidth * 0.5 + "px";
+            playerElement.style.top = containerHeight * 0.7 + "px";
+            break;
+          // ... (similar adjustments for other positions)
+          default:
+            break;
+        }
+
+        diamondContainer.appendChild(playerElement);
+      });
     }
 
     // Function to reset the lineup
@@ -207,70 +252,7 @@
       selectedPlayers = [];
 
       createPositionList();
-    }
-
-    // Function to get selected players
-    function getSelectedPlayers() {
-      return selectedPlayers;
-    }
-
-    // Function to display selected players on the baseball diamond
-    function displayOnBaseballDiamond() {
-      // Clear existing player names on the baseball diamond
-      var existingPlayerNames = document.querySelectorAll(".player-name");
-      existingPlayerNames.forEach(function (name) {
-        document.body.removeChild(name);
-      });
-
-      // Logic to position players on the baseball diamond
-      selectedPlayers.forEach(function (player) {
-        // Determine the coordinates based on the player's position
-        var coordinates = determineCoordinates(player.position);
-
-        // Create a div element for the player's name
-        var playerNameDiv = document.createElement("div");
-        playerNameDiv.className = "player-name";
-        playerNameDiv.innerHTML = player.playerName;
-
-        // Position the div on the baseball diamond
-        playerNameDiv.style.position = "absolute";
-        playerNameDiv.style.left = coordinates.x + "px";
-        playerNameDiv.style.top = coordinates.y + "px";
-
-        // Append the div to the body
-        document.body.appendChild(playerNameDiv);
-      });
-    }
-
-    // Function to determine coordinates based on the player's position
-    function determineCoordinates(position) {
-      // Map positions to specific X, Y coordinates on the baseball diamond image
-      switch (position) {
-        case "Pitcher":
-          return { x: 1078, y: 1082 };
-        case "Catcher":
-          return { x: 932, y: 1579 };
-        case "1st Base":
-          return { x: 1493, y: 998 };
-        case "2nd Base":
-          return { x: 1172, y: 710 };
-        case "3rd Base":
-          return { x: 539, y: 950 };
-        case "Shortstop":
-          return { x: 646, y: 714 };
-        case "Left Field":
-          return { x: 329, y: 482 };
-        case "Center Field":
-          return { x: 898, y: 228 };
-        case "Right Field":
-          return { x: 1348, y: 464 };
-        case "Bench 1":
-          return { x: 484, y: 1254 };
-        case "Bench 2":
-          return { x: 487, y: 1319 };
-        default:
-          return { x: 0, y: 0 }; // Default coordinates
-      }
+      displaySelectedPlayers();
     }
 
     // Create the lineup when the page loads
